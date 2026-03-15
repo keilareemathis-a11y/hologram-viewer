@@ -1,0 +1,12 @@
+{
+  "name": "hologram-viewer",
+  "version": "1.0.0",
+  "description": "A hologram character chatbot powered by Three.js and the OpenAI API.",
+  "scripts": {
+    "start": "serve ."
+  },
+  "devDependencies": {
+    "serve": "14.2.6"
+  },
+  "license": "MIT"
+}
