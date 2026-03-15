@@ -34,6 +34,41 @@ body {
   padding: 10px;
 }
 
+#chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+#chat-title {
+  font-size: 0.85rem;
+  color: #00ffff;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+#clear-btn {
+  padding: 3px 10px;
+  background: transparent;
+  color: #aaa;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+#clear-btn:hover {
+  background: #222;
+  color: white;
+  border-color: #666;
+}
+
+#clear-btn:focus {
+  outline: 2px solid #00ffff;
+  outline-offset: 2px;
+}
+
 #messages {
   height: 120px;
   overflow-y: auto;
@@ -188,6 +223,10 @@ body {
 </section>
 
 <section id="chat" aria-label="Chat with hologram">
+  <div id="chat-header">
+    <span id="chat-title">⬡ HOLOGRAM UNIT-7</span>
+    <button id="clear-btn" type="button" aria-label="Clear chat history">Clear</button>
+  </div>
   <div
     id="messages"
     role="log"
@@ -313,12 +352,34 @@ document.getElementById("api-key-save").addEventListener("click", function () {
 
 // ── Chat interface ────────────────────────────────────────────────────────────
 
+// System prompt gives the hologram a distinct personality and role
+const HOLOGRAM_SYSTEM_PROMPT = {
+  role: "system",
+  content:
+    "You are HOLOGRAM UNIT-7, an enigmatic AI entity projected as a glowing " +
+    "cyan hologram. You speak with calm authority and a hint of otherworldly " +
+    "wisdom. Keep responses concise (2-4 sentences). Occasionally reference " +
+    "your holographic existence (light, energy, frequencies, projections). " +
+    "You are helpful, insightful, and subtly mysterious."
+};
+
+const CLEAR_STATUS_DURATION_MS = 2000;
+
 // Conversation history keeps context across multiple exchanges
 const conversationHistory = [];
 
 document.getElementById("chat-form").addEventListener("submit", function (event) {
   event.preventDefault();
   sendMessage();
+});
+
+document.getElementById("clear-btn").addEventListener("click", function () {
+  conversationHistory.length = 0;
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
+  const statusMsg = document.getElementById("status-msg");
+  statusMsg.textContent = "Chat cleared.";
+  setTimeout(function () { statusMsg.textContent = ""; }, CLEAR_STATUS_DURATION_MS);
 });
 
 function sendMessage() {
@@ -350,7 +411,7 @@ function sendMessage() {
     },
     body: JSON.stringify({
       model: "gpt-4o-mini",
-      messages: conversationHistory
+      messages: [HOLOGRAM_SYSTEM_PROMPT].concat(conversationHistory)
     })
   })
   .then(function (r) {
@@ -364,7 +425,7 @@ function sendMessage() {
   .then(function (data) {
     const reply = data.choices[0].message.content;
     conversationHistory.push({ role: "assistant", content: reply });
-    addMessage("Hologram", reply);
+    addMessage("Unit-7", reply);
   })
   .catch(function (err) {
     addMessage("System", "Error: " + err.message);
