@@ -283,16 +283,23 @@ let model;
 
 const loader = new THREE.GLTFLoader();
 
-loader.load(
-"https://models.readyplayer.me/69b6c4172de3dcd9833643cc.glb",
-function(gltf) {
-    model = gltf.scene;
-    scene.add(model);
-  },
-  undefined,
-  function (error) {
-    // Fallback: render a simple hologram-style wireframe sphere
-    console.warn("character.glb not found, showing fallback geometry.", error);
+let currentVrm;
+
+loader.load("avatar.vrm", (gltf) => {
+
+THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
+
+THREE.VRM.from(gltf).then((vrm) => {
+
+scene.add(vrm.scene);
+
+vrm.scene.rotation.y = Math.PI;
+
+currentVrm = vrm;
+
+});
+
+});
     const geometry = new THREE.IcosahedronGeometry(1, 1);
     const material = new THREE.MeshBasicMaterial({
       color: 0x00ffff,
