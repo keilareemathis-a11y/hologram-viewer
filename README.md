@@ -4,14 +4,14 @@ A hologram character chatbot powered by [Three.js](https://threejs.org/) and the
 
 ## Features
 
-- **3D hologram scene** – renders a rotating GLTF character model (falls back to a cyan wireframe sphere if the model is missing).
+- **3D hologram scene** – renders a rotating VRM or GLTF character model (tries `avatar.vrm` first, then `character.glb`; falls back to a cyan wireframe sphere if neither is present).
 - **Chat interface** – send messages to the hologram and receive AI-generated replies using `gpt-4o-mini`.
 - **Accessible** – keyboard-navigable, ARIA-labelled, and screen-reader friendly.
 - **API key stored locally** – your OpenAI API key is saved in `localStorage` and never sent anywhere except the OpenAI API.
 
 ## Usage
 
-1. **Provide your character model** (optional): place a `character.glb` file in the same directory as `index.html`. If none is found, a wireframe sphere is displayed instead.
+1. **Provide your character model** (optional): place an `avatar.vrm` or `character.glb` file in the same directory as `index.html`. The viewer first tries to load `avatar.vrm`; if that is absent it falls back to `character.glb`; if neither is found a cyan wireframe sphere is displayed instead.
 2. **Open `index.html`** in a browser (or serve the directory with a local HTTP server, e.g. `npx serve .`).
 3. **Enter your OpenAI API key** in the top-right field and click **Save Key**.
 4. Type a message in the chat input at the bottom and press **Send** (or hit Enter) to talk to the hologram.

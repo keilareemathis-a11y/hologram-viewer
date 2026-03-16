@@ -280,33 +280,54 @@ scene.add(ambientLight);
 camera.position.z = 3;
 
 let model;
-
-const loader = new THREE.GLTFLoader();
-
 let currentVrm;
 
-loader.load("avatar.vrm", (gltf) => {
-
-THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
-
-THREE.VRM.from(gltf).then((vrm) => {
-
-scene.add(vrm.scene);
-
-vrm.scene.rotation.y = Math.PI;
-
-currentVrm = vrm;
-
+const loader = new THREE.GLTFLoader();
+loader.register(function (parser) {
+  return new THREE_VRM.VRMLoaderPlugin(parser);
 });
 
-});
-    const geometry = new THREE.IcosahedronGeometry(1, 1);
-    const material = new THREE.MeshBasicMaterial({
-      color: 0x00ffff,
-      wireframe: true
-    });
-    model = new THREE.Mesh(geometry, material);
-    scene.add(model);
+function loadFallbackMesh() {
+  const geometry = new THREE.IcosahedronGeometry(1, 1);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0x00ffff,
+    wireframe: true
+  });
+  model = new THREE.Mesh(geometry, material);
+  scene.add(model);
+}
+
+function loadGlb() {
+  loader.load(
+    "character.glb",
+    function (gltf) {
+      model = gltf.scene;
+      scene.add(model);
+    },
+    undefined,
+    function () {
+      loadFallbackMesh();
+    }
+  );
+}
+
+loader.load(
+  "avatar.vrm",
+  function (gltf) {
+    const vrm = gltf.userData.vrm;
+    if (!vrm) {
+      loadGlb();
+      return;
+    }
+    THREE_VRM.VRMUtils.removeUnnecessaryJoints(vrm.scene);
+    scene.add(vrm.scene);
+    vrm.scene.rotation.y = Math.PI;
+    currentVrm = vrm;
+    model = vrm.scene;
+  },
+  undefined,
+  function () {
+    loadGlb();
   }
 );
 
